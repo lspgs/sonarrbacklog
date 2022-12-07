@@ -8,7 +8,7 @@ def getShows(key,base):
   
     url = f'{base}/api/series'
     headers = {
-  'X-Api-Key': key
+          'X-Api-Key': key
     }
     r = requests.get(url, headers=headers)
     if r.status_code == 200:
@@ -42,21 +42,21 @@ def getEpisodesWanted():
 def getRandomEpisodes(key,base,show_id, num_episodes):
     url = f"{base}/api/episode?seriesId={show_id}"
     headers = {
-  'X-Api-Key': key
+          'X-Api-Key': key
     }
     r = requests.get(url, headers=headers)
     if r.status_code == 200:
-        #ignore specials
+        #ignore specials and already monitored episdoes
         episodes = r.json()
-        episodes = [x for x in episodes if x['seasonNumber'] != 0]
+        episodes = [x for x in episodes if(x['seasonNumber'] != 0 and x['monitored'] != True)]
         random_episodes = random.sample(episodes, num_episodes)
         return random_episodes
 
 def monitorEpisode(key,base,episode):
     url = f'{base}/api/v3/episode/monitor'
     headers = {
-    'X-Api-Key': key,
-    'Content-Type': 'application/json'
+        'X-Api-Key': key,
+        'Content-Type': 'application/json'
     }
     data = {
         'episodeIds': [episode],
@@ -80,7 +80,7 @@ def main():
     random_episodes = getRandomEpisodes(key,url,show_id, num_episodes)
     for episode in random_episodes:
         episode_id=episode['id']
-        monitorEpisode(key,url,episode_id)
+        #monitorEpisode(key,url,episode_id)
         print(f"Season: {episode['seasonNumber']}, Episode: {episode['episodeNumber']}, Title: {episode['title']} marked as monitored.")
 if __name__ == "__main__":
     main()
